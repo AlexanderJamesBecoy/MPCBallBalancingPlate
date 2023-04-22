@@ -29,6 +29,7 @@ class LinearModel:
     """
     _NO_OF_STATES = 8
     _NO_OF_INPUTS = 4
+    _NO_OF_OUTPUTS = 2
     
     def __init__(self, dt, m, g, l, vmax, wmax, Tmax, rmax, I=None, linear=True):
         """
@@ -45,23 +46,26 @@ class LinearModel:
         self.g = g
         self.l = l
         if I is None:
-            self.I = (m * l**2) / 6.0
+            self.I = (4.0 * m * l**2) / 3.0 # (m * l**2) / 6.0
         else:
             self.I = I
 
         # Define the state matrix A.
+        dd_v_factor = 0.6 * g
+        dd_ang_factor = -m * g / self.I
         A = np.array([
             [0., 1., 0., 0., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 3.*g/5., 0., 0., 0.],
+            [0., 0., 0., 0., dd_v_factor, 0., 0., 0.],
             [0., 0., 0., 1., 0., 0., 0., 0.],
-            [0., 0., 0., 0., 0., 0., 3.*g/5., 0.],
+            [0., 0., 0., 0., 0., 0., dd_v_factor, 0.],
             [0., 0., 0., 0., 0., 1., 0., 0.],
-            [-m*g/self.I, 0., 0., 0., 0., 0., 0., 0.],
+            [dd_ang_factor, 0., 0., 0., 0., 0., 0., 0.],
             [0., 0., 0., 0., 0., 0., 0., 1.],
-            [0., 0., -m*g/self.I, 0., 0., 0., 0., 0.],
+            [0., 0., dd_ang_factor, 0., 0., 0., 0., 0.],
         ]) 
 
         # Define the input matrix B.
+        dd_F_factor = -0.5 * l / self.I
         if linear:
             B = np.array([
                 [0., 0., 0., 0.],
@@ -69,9 +73,9 @@ class LinearModel:
                 [0., 0., 0., 0.],
                 [0., 0., 0., 0.],
                 [0., 0., 0., 0.],
-                [-l/(2*self.I), 0., -l/(2*self.I), 0.],
+                [dd_F_factor, 0., dd_F_factor, 0.],
                 [0., 0., 0., 0.],
-                [0., -l/(2*self.I), 0., -l/(2*self.I)],
+                [0., dd_F_factor, 0., dd_F_factor],
             ])
         else:
             B = np.array([
@@ -148,7 +152,8 @@ class LinearModel:
         # Assert that input vector u has valid length.
         assert len(u) == self._NO_OF_INPUTS, f"Parameter u should have length {self._NO_OF_INPUTS}, input has length {len(u)}."
 
-        return np.dot(self.A, x) + np.dot(self.B, u)
+        # return np.dot(self.A, x) + np.dot(self.B, u)
+        return self.A @ x + self.B @ u
     
     def get_output(self, x):
         """
@@ -159,7 +164,8 @@ class LinearModel:
         # Assert that state vector x has valid length.
         assert len(x) == self._NO_OF_STATES, f"Parameter x should have length {self._NO_OF_STATES}, input has length {len(x)}."
 
-        return np.dot(self.C, x)
+        # return np.dot(self.C, x)
+        return self.C @ x
 
 class Plate:
     """
