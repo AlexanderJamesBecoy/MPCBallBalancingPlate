@@ -11,7 +11,7 @@ Created by: Alexander James Becoy
 Date: 22-04-2023
 """
 
-class Controller:
+class MPC:
     """
     
     """
@@ -27,7 +27,7 @@ class Controller:
         self.dt = dt
         self.N = N
         self.Q = np.eye(sys._NO_OF_STATES) # TODO
-        self.R = np.eye(sys._NO_OF_STATES) # TODO
+        self.R = np.eye(sys._NO_OF_INPUTS) # TODO
 
     def predict(self, x_init, x_target):
         """
@@ -48,7 +48,7 @@ class Controller:
 
         for k in range(self.N):
             # Compute the cost at time instant k
-            cost += self.calculate_cost(x[:, k+1], u[:, k], x[:,self.N+1])
+            cost += self.calculate_cost(x[:, k+1], u[:, k], x[:,self.N])
             
             # Consider constraints at time instant k
             constraints += [
@@ -66,7 +66,11 @@ class Controller:
 
         # Solve the problem
         problem = cp.Problem(cp.Minimize(cost), constraints)
-        problem.solve(solver=cp.OSQP)
+        problem.solve(solver=cp.OSQP) # verbose=True
+        print(f"Status: {problem.status}")
+
+        # Assert that a solution is found
+        assert u[:, 0].value is not None and x[:, 1].value is not None, "No feasible solution is found."
 
         return u[:, 0].value, x[:, 1].value, x[:, :].value, None
 
@@ -84,9 +88,9 @@ class Controller:
         # Obtain P using Discrete Algebraic Riccati Equation (DARE).
         P = self.Q
         for n in range(self.N):
-            P1 = cp.quad_form(self.sys.A, self.Q)
+            P1 = (self.sys.A.T @ P) @ self.sys.A
             P2 = (self.sys.A.T @ P) @ self.sys.B
-            P3 = np.linalg.inv(self.R + cp.quad_form(self.sys.B, P))
+            P3 = np.linalg.inv(self.R + (self.sys.B.T @ P) @ self.sys.B)
             P4 = (self.sys.B.T @ P) @ self.sys.A
             P =  P1 - (P2 @ P3) @ P4 + self.Q
         
@@ -94,3 +98,8 @@ class Controller:
         cost += cp.quad_form(x_N, P)
 
         return cost
+    
+    def calculate_DARE(self):
+        """
+        """
+        pass
