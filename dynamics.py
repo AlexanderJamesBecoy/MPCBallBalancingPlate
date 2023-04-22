@@ -108,20 +108,33 @@ class LinearModel:
         @param: Tmax = maximum torque that can be exerted by a motor.
         @param: rmax = length of the maximum moment arm.
         """
-        constraint = {
-            'system': {
-                'x': self.l / 2.0, # m
-                'd_x': vmax[0], # m/s
-                'y': self.l / 2.0, # m
-                'd_y': vmax[1], # m/s
-                'pitch': np.pi/4, # rad
-                'd_pitch': wmax[0], # rad/s
-                'roll': np.pi/4, # rad
-                'd_roll': wmax[1], # rad/s
-            },
-            'input': Tmax / rmax, # N
+        # Calculate constraints
+        dmax = self.l / 2.0
+        ang = np.pi / 4.0
+        Fmax = Tmax / rmax
+        # sys_constraint = np.array([dmax, vmax[0], dmax, vmax[1], ang, wmax[0], ang, wmax[1]])
+        # input_constraint = Fmax * np.ones(self._NO_OF_INPUTS)
+
+        constraints = {
+            'system': np.array([dmax, vmax[0], dmax, vmax[1], ang, wmax[0], ang, wmax[1]]),
+                # 'x': self.l / 2.0, # m
+                # 'd_x': vmax[0], # m/s
+                # 'y': self.l / 2.0, # m
+                # 'd_y': vmax[1], # m/s
+                # 'pitch': np.pi/4, # rad
+                # 'd_pitch': wmax[0], # rad/s
+                # 'roll': np.pi/4, # rad
+                # 'd_roll': wmax[1], # rad/s
+            #     'min': -1.0 * sys_constraint,
+            #     'max': sys_constraint,
+            # },
+            'input': Fmax * np.ones(self._NO_OF_INPUTS),
+                # Tmax / rmax, # N
+            #     'min': -1.0 * input_constraint,
+            #     'max': input_constraint,
+            # }
         }
-        self.constraint = constraint    
+        self.constraints = constraints
 
     def update(self, x, u):
         """
