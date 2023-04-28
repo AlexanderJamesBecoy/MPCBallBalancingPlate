@@ -31,7 +31,7 @@ class LinearModel:
     _NO_OF_INPUTS = 4
     _NO_OF_OUTPUTS = 2
     
-    def __init__(self, dt, m, g, l, vmax, wmax, Tmax, rmax, I=None, linear=True):
+    def __init__(self, dt, m, g, l, d, vmax, wmax, Tmax, rmax, I=None, linear=True):
         """
         Initialize the linearized ball balancing plate and store the parameters.
         @param: dt - time instance
@@ -45,8 +45,9 @@ class LinearModel:
         self.m = m
         self.g = g
         self.l = l
+        self.d = d
         if I is None:
-            self.I = (4.0 * m * l**2) / 3.0 # (m * l**2) / 6.0
+            self.I = (m * (l**2 + d**2)) / 12.0
         else:
             self.I = I
 

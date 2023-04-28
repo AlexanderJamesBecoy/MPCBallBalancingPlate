@@ -26,8 +26,12 @@ class MPC:
         self.sys = sys
         self.dt = dt
         self.N = N
-        self.Q = np.eye(sys._NO_OF_STATES) # TODO
-        self.R = np.eye(sys._NO_OF_INPUTS) # TODO
+        # self.Q = np.eye(sys._NO_OF_STATES) # TODO
+        # self.R = np.eye(sys._NO_OF_INPUTS) # TODO
+
+        self.Q = np.diag([1.,0.,1.,0.,1.,0.,1.,0.])
+        self.R = 0.2 * np.eye(sys._NO_OF_INPUTS)
+        self.P = self.calculate_DARE()
 
     def predict(self, x_init, x_target):
         """
@@ -54,10 +58,13 @@ class MPC:
             constraints += [
                 # System dynamics
                 x[:, k+1] == self.sys.A @ x[:, k] + self.sys.B @ u[:, k],
+                # x[:, 0] == x_init,
 
-                # System constraints
+                # State constraints
                 x[:, k] >= -1.0 * self.sys.constraints['system'],
                 x[:, k] <= self.sys.constraints['system'],
+
+                # Input constraints
                 u[:, k] >= -1.0 * self.sys.constraints['input'],
                 u[:, k] <= self.sys.constraints['input'],
 
@@ -67,7 +74,7 @@ class MPC:
         # Solve the problem
         problem = cp.Problem(cp.Minimize(cost), constraints)
         problem.solve(solver=cp.OSQP) # verbose=True
-        print(f"Status: {problem.status}")
+        # print(f"Status: {problem.status}")
 
         # Assert that a solution is found
         assert u[:, 0].value is not None and x[:, 1].value is not None, "No feasible solution is found."
@@ -85,21 +92,42 @@ class MPC:
         # Calculate the stage function.
         cost = cp.quad_form(x, self.Q) + cp.quad_form(u, self.R)
 
-        # Obtain P using Discrete Algebraic Riccati Equation (DARE).
+        # # Obtain P using Discrete Algebraic Riccati Equation (DARE).
+        # P = self.Q
+        # for n in range(self.N):
+        #     P1 = (self.sys.A.T @ P) @ self.sys.A
+        #     P2 = (self.sys.A.T @ P) @ self.sys.B
+        #     P3 = np.linalg.inv(self.R + (self.sys.B.T @ P) @ self.sys.B)
+        #     P4 = (self.sys.B.T @ P) @ self.sys.A
+        #     P =  P1 - (P2 @ P3) @ P4 + self.Q
+        
+        # Calculate the terminal cost with the found matrix P.
+        cost += cp.quad_form(x_N, self.P)
+
+        return cost
+    
+    def calculate_DARE(self):
+        """
+        Obtain matrix P to calculate the terminal cost using
+        Discrete Algebraic Riccati Equation (DARE).
+        @return P: _NO_OF_STATES x _NO_OF_STATES matrix
+        """
+        # Initialize P as Q
         P = self.Q
+
+        # Calculate P using DARE for N iterations
         for n in range(self.N):
             P1 = (self.sys.A.T @ P) @ self.sys.A
             P2 = (self.sys.A.T @ P) @ self.sys.B
             P3 = np.linalg.inv(self.R + (self.sys.B.T @ P) @ self.sys.B)
             P4 = (self.sys.B.T @ P) @ self.sys.A
             P =  P1 - (P2 @ P3) @ P4 + self.Q
-        
-        # Calculate the terminal cost with the found matrix P.
-        cost += cp.quad_form(x_N, P)
 
-        return cost
+        return P
     
-    def calculate_DARE(self):
+    def generate_terminal_set(self):
         """
+        Generate a terminal set to ensure stability and feasibility.
+        
+        @return T: positively invariant list of points? TODO
         """
-        pass
