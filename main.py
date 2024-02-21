@@ -18,8 +18,10 @@ if __name__ == "__main__":
     while True:
 
         # Make joint1_z move up and down
-        # data.ctrl[0] = 0.01 * np.abs(np.sin( 2 * np.pi * data.time))
-        # data.ctrl[1] = 0.01 * np.abs(np.cos( 2 * np.pi * data.time))
+        data.ctrl[0] = 0.01 * np.abs(np.sin( 2 * np.pi * data.time))
+        # data.ctrl[1] = 0.01 * np.abs(np.sin( 2 * np.pi * data.time + np.pi/2))
+        # data.ctrl[2] = 0.01 * np.abs(np.sin( 2 * np.pi * data.time + np.pi))
+        # data.ctrl[3] = 0.01 * np.abs(np.sin( 2 * np.pi * data.time + 3*np.pi/2))
 
         mujoco.mj_forward(model, data)
         mujoco.mj_step(model, data)
