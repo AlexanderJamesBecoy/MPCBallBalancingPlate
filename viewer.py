@@ -24,8 +24,8 @@ class Viewer:
         self.cam.trackbodyid = 0
         self.cam.distance = 0.5
         self.cam.elevation = -20.0
-        self.cam.azimuth = 180.0
-        self.cam.lookat[2] += 0.1
+        self.cam.azimuth = 135.0
+        # self.cam.lookat[2] += 0.1
         
         self.scene = mujoco.MjvScene(self.model, maxgeom=10000)
         self.context = mujoco.MjrContext(self.model, mujoco.mjtFontScale.mjFONTSCALE_150.value)

@@ -1,0 +1,74 @@
+<mujoco model="mpc-ball-balancing-plate">
+    <compiler autolimits="true" angle="degree"/>
+    <option timestep="0.001" iterations="50" solver="PGS" gravity="0 0 -9.81"/>
+
+    <!-- <default>
+      <geom conaffinity="1" condim="3" friction="0 0 0" rgba="0.7 0.7 0.7 1"/>
+    </default> -->
+  
+    <asset>
+      <texture name="grid" type="2d" builtin="checker" rgb1=".1 .2 .3"
+       rgb2=".2 .3 .4" width="300" height="300"/>
+      <material name="grid" texture="grid" texrepeat="8 8" reflectance=".2"/>
+    </asset>
+  
+    <worldbody>
+      <!-- <geom size=".2 .2 .01" type="plane" material="grid"/> -->
+      <light pos="0 0 .6"/>
+      <camera name="closeup" pos="0 -.1 .07" xyaxes="1 0 0 0 1 2"/>
+
+      <body name="ball" pos="0 -0.05 0.1">
+        <freejoint/>
+        <geom name="shape_ball" type="sphere" size=".01" rgba="0.7 0.7 0.7 1" condim="3"/>
+        <inertial pos="0 0 0" mass="0.001" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+      </body>
+
+      <body name="base_link" pos="0 0 0">
+        <geom name="stem" type="cylinder" pos="0 0 0.035" size="0.005 .035" rgba="0.7 0.7 0.7 1"/>
+        <body name="pivot" pos="0 0 0.0725">
+          <geom name="shape_pivot" type="sphere" size=".0025" pos="0 0 0" rgba="0.5 0.5 0.5 1"/>
+          <body name="plate" pos="0 0 0.005">
+            <joint name="joint_plate" type="ball"/>
+            <geom name="shape_plate" type="box" size="0.1 0.1 0.001" rgba="0.7 0.7 0.7 1" condim="3"/>
+            <inertial pos="0 0 0" mass="0.1" fullinertia="0.0001 0.0001 0.0001 0 0 0"/>
+          </body>
+        </body>
+      </body>
+
+      <!-- <body name="motor1" pos="0 0.085 0.035">
+        <joint name="motor1_z" type="slide" axis="0 0 1" range="0 0.5"/>
+        <geom name="motor1_stem" type="cylinder" pos="0 0 0" size="0.005 0.01" rgba="0.7 0.7 0.7 1"/>
+        <geom name="motor1_pivot" type="sphere" size=".005" pos="0 0 .0125" rgba="0.5 0.5 0.5 1"/>
+      </body>
+
+      <body name="motor2" pos="0 -0.085 0.035">
+        <joint name="motor2_z" type="slide" axis="0 0 1" range="0 0.5"/>
+        <geom name="motor2_stem" type="cylinder" pos="0 0 0" size="0.005 0.01" rgba="0.7 0.7 0.7 1"/>
+        <geom name="motor2_pivot" type="sphere" size=".005" pos="0 0 .0125" rgba="0.5 0.5 0.5 1"/>
+      </body>
+
+      <body name="motor3" pos="0.085 0 0.035">
+        <joint name="motor3_z" type="slide" axis="0 0 1" range="0 0.5"/>
+        <geom name="motor3_stem" type="cylinder" pos="0 0 0" size="0.005 0.01" rgba="0.7 0.7 0.7 1"/>
+        <geom name="motor3_pivot" type="sphere" size=".005" pos="0 0 .0125" rgba="0.5 0.5 0.5 1"/>
+      </body>
+
+      <body name="motor4" pos="-0.085 0 0.035">
+        <joint name="motor4_z" type="slide" axis="0 0 1" range="0 0.5"/>
+        <geom name="motor4_stem" type="cylinder" pos="0 0 0" size="0.005 0.01" rgba="0.7 0.7 0.7 1"/>
+        <geom name="motor4_pivot" type="sphere" size=".005" pos="0 0 .0125" rgba="0.5 0.5 0.5 1"/>
+      </body> -->
+
+    </worldbody>
+  
+    <!-- <actuator>
+      <motor joint="motor1_z" gear="5.0"/>
+      <motor joint="motor2_z" gear="5.0"/>
+      <motor joint="motor3_z" gear="5.0"/>
+      <motor joint="motor4_z" gear="5.0"/>
+    </actuator> -->
+
+    <!-- <keyframe>
+      <key name="spinning" qpos="0 0 0.02 1 0 0 0" qvel="0 0 0 0 1 200" />
+    </keyframe> -->
+  </mujoco>
