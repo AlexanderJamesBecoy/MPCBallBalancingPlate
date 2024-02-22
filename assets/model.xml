@@ -1,6 +1,6 @@
 <mujoco model="mpc-ball-balancing-plate">
     <compiler autolimits="true"/>
-    <option timestep="0.001" iterations="50" solver="PGS" gravity="0 0 -9.81"/>
+    <option timestep="0.0001" iterations="50" solver="PGS" gravity="0 0 -9.81"/>
   
     <asset>
       <texture name="grid" type="2d" builtin="checker" rgb1=".1 .2 .3"
@@ -13,11 +13,11 @@
       <light pos="0 0 .6"/>
       <camera name="closeup" pos="0 -.1 .07" xyaxes="1 0 0 0 1 2"/>
 
-      <body name="ball" pos="0 0 0.1">
+      <!-- <body name="ball" pos="0 0 0.1">
         <joint name="joint_ball" type="free"/>
         <geom name="shape_ball" type="sphere" size=".01" rgba="0.7 0.7 0.7 1" condim="3"/>
-        <inertial pos="0 0 0" mass="0.01" fullinertia="0.1 0.1 0.1 -0.01 -0.01 -0.01"/>
-      </body>
+        <inertial pos="0 0 0" mass="0.01" fullinertia="0.01 0.01 0.01 -0.001 -0.001 -0.001"/>
+      </body> -->
 
       <body name="base_link" pos="0 0 0">
         <geom name="stem" type="cylinder" pos="0 0 0.035" size="0.005 .035" rgba="0.7 0.7 0.7 1"/>
@@ -27,23 +27,22 @@
             <joint name="joint_plate" type="ball" pos="0 0 0"/>
             <geom name="shape_plate" type="box" size="0.1 0.1 0.001" rgba="0.7 0.7 0.7 1" condim="3"/>
             <inertial pos="0 0 0" mass="0.01" fullinertia="0.001 0.001 0.001 1e-4 1e-4 1e-4"/>
-            <body name="joints" pos="0 0 0">
-              <joint name="joint_plate_x1" type="slide" pos="-0.1 0 0" axis="0 0 1" range="-1.0 1.0" armature="9.98"/>
-              <joint name="joint_plate_x2" type="slide" pos="0.1 0 0" axis="0 0 1" range="-1.0 1.0" armature="9.98"/>
-              <joint name="joint_plate_y1" type="slide" pos="0 -0.1 0" axis="0 0 1" range="-1.0 1.0" armature="9.98"/>
-              <joint name="joint_plate_y2" type="slide" pos="0 -0.1 0" axis="0 0 1" range="-1.0 1.0" armature="9.98"/>
-              <inertial pos="0 0 0" mass="1e-3" fullinertia="0.001 0.001 0.001 1e-4 1e-4 1e-4"/>
-            </body>
+
+            <site name="joint_plate_x1" pos="-0.1 0 0" rgba="1 0 0 1"/>
+            <site name="joint_plate_x2" pos="0.1 0 0" rgba="1 1 0 1"/>
+            <site name="joint_plate_y1" pos="0 -0.1 0" rgba="0 1 0 1"/>
+            <site name="joint_plate_y2" pos="0 0.1 0" rgba="0 0 1 1"/>
+
           </body>
         </body>
       </body>
     </worldbody>
   
     <actuator>
-      <motor name="motor_plate_x1" joint="joint_plate_x1" gear="100.0"/>
-      <motor name="motor_plate_x2" joint="joint_plate_x2" gear="100.0"/>
-      <motor name="motor_plate_y1" joint="joint_plate_y1" gear="100.0"/>
-      <motor name="motor_plate_y2" joint="joint_plate_y2" gear="100.0"/>
+      <motor name="motor_plate_x1" site="joint_plate_x1" gear="0 0 1 0 0 0"/>
+      <motor name="motor_plate_x2" site="joint_plate_x2" gear="0 0 1 0 0 0"/>
+      <motor name="motor_plate_y1" site="joint_plate_y1" gear="0 0 1 0 0 0"/>
+      <motor name="motor_plate_y2" site="joint_plate_y2" gear="0 0 1 0 0 0"/>
     </actuator>
 
   </mujoco>

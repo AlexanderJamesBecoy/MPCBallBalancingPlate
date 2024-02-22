@@ -9,6 +9,9 @@ model = mujoco.MjModel.from_xml_path(xml_path)
 data = mujoco.MjData(model)
 viewer = Viewer(model, data)
 
+framerate = 60 # Hz
+counter = 0
+
 if __name__ == "__main__":
 
     print("Press Ctrl+C to stop the simulation.")
@@ -18,11 +21,14 @@ if __name__ == "__main__":
     while True:
 
         # Make joint1_z move up and down
-        data.ctrl[0] = 2.0 * np.sin( 2 * np.pi * data.time)
-        data.ctrl[1] = 2.0 * np.abs(np.sin( 2 * np.pi * data.time + np.pi/2))
-        data.ctrl[2] = 2.0 * np.abs(np.sin( 2 * np.pi * data.time + np.pi))
-        data.ctrl[3] = 2.0 * np.abs(np.sin( 2 * np.pi * data.time + 3*np.pi/2))
+        data.ctrl[0] = 1e-3 * np.sin( np.pi * data.time)
+        data.ctrl[1] = 1e-3 * np.sin( np.pi * data.time + np.pi/2)
+        data.ctrl[2] = 1e-3 * np.sin( np.pi * data.time + np.pi)
+        data.ctrl[3] = 1e-3 * np.sin( np.pi * data.time + 3*np.pi/2)
 
         mujoco.mj_forward(model, data)
         mujoco.mj_step(model, data)
-        viewer.update()
+        
+        if counter < data.time * framerate:
+            viewer.update()
+            counter += 1
