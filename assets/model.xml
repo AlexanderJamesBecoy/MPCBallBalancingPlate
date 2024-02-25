@@ -24,9 +24,11 @@
         <body name="pivot" pos="0 0 0.0725">
           <geom name="shape_pivot" type="sphere" size=".0025" pos="0 0 0" rgba="0.5 0.5 0.5 1"/>
           <body name="plate" pos="0 0 0.005">
-            <joint name="joint_plate" type="ball" pos="0 0 0"/>
+            <!-- <joint name="joint_plate" type="ball" pos="0 0 0"/> -->
+            <joint name="joint_plate_x" type="hinge" pos="0 0 0" axis="1 0 0"/>
+            <joint name="joint_plate_y" type="hinge" pos="0 0 0" axis="0 1 0"/>
             <geom name="shape_plate" type="box" size="0.1 0.1 0.001" rgba="0.7 0.7 0.7 1" condim="3"/>
-            <inertial pos="0 0 0" mass="0.01" fullinertia="0.001 0.001 0.001 1e-4 1e-4 1e-4"/>
+            <inertial pos="0 0 0" mass="10" fullinertia="10 10 10 1 1 1"/>
 
             <site name="joint_plate_x1" pos="-0.1 0 0" rgba="1 0 0 1"/>
             <site name="joint_plate_x2" pos="0.1 0 0" rgba="1 1 0 1"/>
@@ -39,10 +41,10 @@
     </worldbody>
   
     <actuator>
-      <motor name="motor_plate_x1" site="joint_plate_x1" gear="0 0 1 0 0 0"/>
-      <motor name="motor_plate_x2" site="joint_plate_x2" gear="0 0 1 0 0 0"/>
-      <motor name="motor_plate_y1" site="joint_plate_y1" gear="0 0 1 0 0 0"/>
-      <motor name="motor_plate_y2" site="joint_plate_y2" gear="0 0 1 0 0 0"/>
+      <motor name="motor_plate_x1" site="joint_plate_x1" gear="0 0 1 0 0 0" forcelimited="true" forcerange="-5 5"/>
+      <motor name="motor_plate_x2" site="joint_plate_x2" gear="0 0 10 0 0 0" forcelimited="true" forcerange="-5 5"/>
+      <motor name="motor_plate_y1" site="joint_plate_y1" gear="0 0 10 0 0 0" forcelimited="true" forcerange="-5 5"/>
+      <motor name="motor_plate_y2" site="joint_plate_y2" gear="0 0 10 0 0 0" forcelimited="true" forcerange="-5 5"/>
     </actuator>
 
   </mujoco>
